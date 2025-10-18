@@ -17,11 +17,25 @@ BASE_URL = "https://graph.threads.net/v1.0"
 
 # 讀取自己的 Threads 貼文
 def get_my_threads():
+    threads = []
     url = f"{BASE_URL}/{USER_ID}/threads"
     params = {"access_token": ACCESS_TOKEN , "fields": "id,text"}
     res = requests.get(url, params=params)
     res.raise_for_status()
-    return res.json().get("data", [])
+
+    data = res.json().get("data", [])
+    next_page = res.json().get("paging", {}).get("next")
+
+    while next_page:
+        # print("取得更多貼文...: " + next_page)
+        # print("取得更多貼文...: ")
+        threads.extend(data)
+        res = requests.get(next_page)
+        res.raise_for_status()
+        data = res.json().get("data", [])
+        next_page = res.json().get("paging", {}).get("next")
+
+    return threads
 
 # 刪除 Threads 貼文
 def delete_thread(thread_id):
@@ -36,6 +50,9 @@ def delete_thread(thread_id):
 # 主流程
 def main():
     threads = get_my_threads()
+    print("取得的貼文數量:", len(threads))
+    # print(threads[0:2])  # 顯示前兩篇貼文
+    # return # 測試時先不執行刪除動作
     for post in threads:
         # print(post)
         text = post.get("text", "")
