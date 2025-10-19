@@ -9,6 +9,7 @@
 - `cleaner.py`
 - `get_our_post_reply.py`
 - `threads_post_v1.py`
+- `ready_cleaner.py`
 
 ## 去哪裡找 Access Token
 
